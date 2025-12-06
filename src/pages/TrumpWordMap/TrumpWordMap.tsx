@@ -5,15 +5,11 @@ import {
   HStack,
   Card,
   CardBody,
-  Stat,
-  StatLabel,
-  StatNumber,
   Alert,
   AlertIcon,
   AlertTitle,
   AlertDescription,
   Button,
-  Skeleton,
   Input,
   InputGroup,
   InputLeftElement,
@@ -21,7 +17,6 @@ import {
   Flex,
   Badge,
   VStack,
-  IconButton,
 } from '@chakra-ui/react'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { WordCloud } from '@/components/WordCloud'
@@ -36,12 +31,6 @@ const SearchIcon = () => (
 const CalendarIcon = () => (
   <Icon viewBox="0 0 24 24" fill="currentColor" boxSize={4}>
     <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z" />
-  </Icon>
-)
-
-const CloseIcon = () => (
-  <Icon viewBox="0 0 24 24" fill="currentColor" boxSize={5}>
-    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
   </Icon>
 )
 
@@ -68,19 +57,17 @@ function TrumpWordMap() {
   const [activePreset, setActivePreset] = useState('All Time')
   const [controlsVisible, setControlsVisible] = useState(true)
   const [panelOpen, setPanelOpen] = useState(false)
-  const hideTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   
   // Selectors
   const wordCloud = useAppSelector((state) => state.speechModel.wordCloud)
   const wordCloudLoading = useAppSelector((state) => state.speechModel.wordCloudLoading)
-  const wordCloudError = useAppSelector((state) => state.speechModel.wordCloudError)
   const speechStats = useAppSelector((state) => state.speechModel.speechStats)
   const wordStats = useAppSelector((state) => state.speechModel.wordStats)
   const statsLoading = useAppSelector((state) => state.speechModel.statsLoading)
   const apiConnected = useAppSelector((state) => state.speechModel.apiConnected)
   const dateFilter = useAppSelector((state) => state.speechModel.dateFilter) || { startDate: undefined, endDate: undefined }
-  const availableDateRange = useAppSelector((state) => state.speechModel.availableDateRange) || { minDate: null, maxDate: null }
 
   // Reset hide timer
   const resetHideTimer = useCallback(() => {

@@ -239,7 +239,7 @@ export const speechModel = createModel<RootModel>()({
     /**
      * Apply date filter and refresh data
      */
-    async applyDateFilter(dateFilter: DateFilter, rootState) {
+    async applyDateFilter(dateFilter: DateFilter, _rootState) {
       dispatch.speechModel.setDateFilter(dateFilter)
       
       // Refresh word cloud and stats with new filter
