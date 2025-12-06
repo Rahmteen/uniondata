@@ -7,6 +7,18 @@ dotenv.config()
 // Force IPv4 to avoid Railway IPv6 connectivity issues
 dns.setDefaultResultOrder('ipv4first')
 
+// Also set at resolver level
+const originalLookup = dns.lookup
+dns.lookup = ((hostname: string, options: any, callback: any) => {
+  if (typeof options === 'function') {
+    callback = options
+    options = { family: 4 }
+  } else {
+    options = { ...options, family: 4 }
+  }
+  return originalLookup(hostname, options, callback)
+}) as typeof dns.lookup
+
 // Check for required environment variables
 if (!process.env.DATABASE_URL && !process.env.DB_HOST) {
   console.warn(`
@@ -20,12 +32,18 @@ Then restart the server.
 `)
 }
 
+// Parse DATABASE_URL to add connection options
+const dbUrl = process.env.DATABASE_URL || ''
+const isSupabase = dbUrl.includes('supabase') || dbUrl.includes('pooler')
+
 // Create pool with SSL support for Supabase/cloud databases
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL?.includes('supabase') || process.env.DATABASE_URL?.includes('pooler')
-    ? { rejectUnauthorized: false }
-    : undefined,
+  ssl: isSupabase ? { rejectUnauthorized: false } : undefined,
+  // Connection settings for better reliability
+  connectionTimeoutMillis: 10000,
+  idleTimeoutMillis: 30000,
+  max: 10,
 })
 
 // Test connection
