@@ -1,7 +1,11 @@
 import { Pool } from 'pg'
+import dns from 'dns'
 import dotenv from 'dotenv'
 
 dotenv.config()
+
+// Force IPv4 to avoid Railway IPv6 connectivity issues
+dns.setDefaultResultOrder('ipv4first')
 
 // Check for required environment variables
 if (!process.env.DATABASE_URL && !process.env.DB_HOST) {
@@ -19,7 +23,7 @@ Then restart the server.
 // Create pool with SSL support for Supabase/cloud databases
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL?.includes('supabase') 
+  ssl: process.env.DATABASE_URL?.includes('supabase') || process.env.DATABASE_URL?.includes('pooler')
     ? { rejectUnauthorized: false }
     : undefined,
 })
